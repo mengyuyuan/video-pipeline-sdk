@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.3.0（开发中）· 独立接口本体 P2
+
+- 新 `pipeline/run.py`：单入口 stage 机（十段：ingest→transcribe→scenes→design-table→scaffold→build→verify→preview→render→deliver）＋两道确认门（checkpoint-1 设计表 / checkpoint-2 预览）＋退出码（0 完成 / 2 门失败 / 3 待作答 / 1 异常）＋断点续跑（run-state.json）
+- 新 `pipeline/ask.py` + `assets/cards/index.html`：问题协议（多选/单选/审批/自由文本 + 预览图）＋本地卡面服务（默认 8898，占用自动 +1，避开端口矩阵）＋ `--emit` 交宿主渲染
+- 新 `pipeline/doctor.py`：环境自检（硬依赖 / 软依赖分级）
+- 新 `gates/aggregate.py`：七件门聚合，verify / render 双相 + 报告按 id 合并 → gate-report.md/json
+- 卡面/协议边界：宿主只经 questions.json / answers/<id>.json 对接（协议是脊柱，界面只是渲染器）
+- 冒烟验证：全流程 3→3→3→0（两次停门、两次放行、完成交付五件套 + manifest）；卡面 e2e 通过
+
 ## v0.2.1 — 2026-09-16（深夜）
 
 - 弹药仓 +2：`assets/fx/FxPanel3D.tsx`（FX-15 真透视 3D 卡 · 融入现实斜面板）/ `assets/fx/FxBehindMask.tsx`（FX-16 人物蒙版分层 · 背后物件与文字穿人的底座件）——均为真片生产验证件

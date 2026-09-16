@@ -52,3 +52,5 @@ python tools/check_sync.py --ref ref.wav --test out.mp4 --windows 8-14,30-36,60-
 - **「mask + filter: blur」勿同元素叠加**：带 mask 的发光层再叠 blur 滤镜会整体失效（Chromium 渲染实测多轮零变化）；柔边用径向渐变自带 + `maskSize` 放大出血（102–104%）。
 - **React 内联 `perspective` 必须写字符串**：`perspective: 1500`（数字）不补 px、静默无效（面板只像 2D 斜切）；写 `perspective: '1500px'`。
 - **多视频层必须显式定位**：第二个 `OffthreadVideo` 走文档流会排到画面外、看起来像"没生效"；所有视频层显式 `position:'absolute', inset:0, width/height:'100%'`。
+- **同文件重复导出同名符号 = 整页白屏**：`import { X }` 挪了位置但旧 `export { X }` 没删 → esbuild `Multiple exports with the same name` → **整个 Studio 页面白屏**（不是单 comp 坏；页面无元素级报错，容易误判成"渲染挂了"）。定位：看 studio 日志的 `ERROR in ./src/...` 行；同名导出只留一处。
+- **无头截屏做元素核验会"假缺失"**：playwright 播放到点截屏的帧位会漂移（等待越久漂移越大，20-30s 处实测可达 ±20 帧），曾两轮把"已经在画面上的元素"报成缺失。元素级 QA 一律用 `npx remotion still build <Comp> --frame=N` 精确单帧；截屏只作粗看。

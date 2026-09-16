@@ -460,7 +460,9 @@ def st_deliver(ctx: dict) -> tuple[str, str]:
     manifest = {
         "sdk_version": VERSION, "run_id": st.get("run_id"), "source": st["source"],
         "out_dir": str(out), "created": st.get("created"), "delivered_at": now_iso(),
-        "files": files, "missing_optional": [m for m in missing], "stages": {k: v.get("status") for k, v in st["stages"].items()},
+        "files": files, "missing_optional": [m for m in missing],
+        # 交付物自述：manifest 生成于 deliver 完成时刻，本阶段状态回写为 done
+        "stages": {**{k: v.get("status") for k, v in st["stages"].items()}, "deliver": "done"},
     }
     (out / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
     return "done", f"交付完成：{len(files) + 1} 件（含 manifest）"

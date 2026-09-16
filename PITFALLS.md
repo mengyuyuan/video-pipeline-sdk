@@ -28,6 +28,8 @@ python tools/check_sync.py --ref ref.wav --test out.mp4 --windows 8-14,30-36,60-
 
 ## 3. 素材与 OffthreadVideo
 
+- **多视频层必须显式定位**：`<OffthreadVideo>` 是块级元素、走正常文档流——同一画面放第二个视频时它会排在第一个下方（y=1080 起）**直接掉出画布**，看起来像"这层没生效"。所有视频层一律给 `style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}`。（曾用 webm 蒙版排查半天，真因在此）
+- **透明视频（alpha webm）在 ffmpeg 8.1 会静默丢 alpha**：VP8/VP9 用 `-pix_fmt yuva420p` 编码后，解码回来 alpha 全是 255，无任何告警。稳妥方案：**同源视频 + 逐帧 alpha 蒙版 PNG（CSS mask-image）**——零编码风险、免二次压缩、预览与渲染皆可用、还顺带能改蒙版（羽化/收缩）。蒙版 PNG 存黑底 + alpha 通道（约 54KB/帧 @1080p）。
 - **关键帧**：素材转码必须 `-g 30 -keyint_min 30 -sc_threshold 0`（每秒一个关键帧），OffthreadVideo 逐帧 seek 才精确且快；否则渲染慢或抽错帧。
 - **转码基线**：`fps=30` + `scale=1920:1080:force_original_aspect_ratio=decrease` + `pad`（等比缩放补边，不拉伸）；脚本 `tools/transcode_material.py`。
 - **PiP 小窗**：OffthreadVideo 不给显式 `width/height` 会被容器裁空白——必须显式尺寸。
@@ -47,3 +49,6 @@ python tools/check_sync.py --ref ref.wav --test out.mp4 --windows 8-14,30-36,60-
 - **Python 子进程调 npx**：Windows 用 `shutil.which("npx.cmd")` 拿全路径，裸名找不到。
 - **PowerShell 5.1 中文脚本**：.ps1 含中文必须存 UTF-8 BOM，否则解析炸。
 - **改前先读**：编辑既有文件前先读磁盘现状取锚点（外部工具/协作者可能已改过），否则批量替换会错配。
+- **「mask + filter: blur」勿同元素叠加**：带 mask 的发光层再叠 blur 滤镜会整体失效（Chromium 渲染实测多轮零变化）；柔边用径向渐变自带 + `maskSize` 放大出血（102–104%）。
+- **React 内联 `perspective` 必须写字符串**：`perspective: 1500`（数字）不补 px、静默无效（面板只像 2D 斜切）；写 `perspective: '1500px'`。
+- **多视频层必须显式定位**：第二个 `OffthreadVideo` 走文档流会排到画面外、看起来像"没生效"；所有视频层显式 `position:'absolute', inset:0, width/height:'100%'`。

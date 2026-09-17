@@ -69,9 +69,27 @@ def main() -> None:
     if not cfg_path.is_file():
         write_reports(rd, merged, note="未配置门（gates.json 缺失）——不算通过")
         sys.exit(1)
-    cfg = json.loads(cfg_path.read_text(encoding="utf-8"))
+    try:
+        cfg = json.loads(cfg_path.read_text(encoding="utf-8"))
+    except Exception as e:  # noqa: BLE001
+        write_reports(rd, merged, note=f"gates.json 无法解析：{e}")
+        print(f"gates.json 无法解析：{e}", file=sys.stderr)
+        sys.exit(1)
     entries = [g for g in cfg.get("gates", [])
                if args.phase == "all" or g.get("phase", "verify") == args.phase]
+    # {run_dir} / {out_dir} 占位符替换（手写 gates.json 也可直接用占位符）
+    _outd = ""
+    _stp = rd / "run-state.json"
+    if _stp.is_file():
+        try:
+            _outd = json.loads(_stp.read_text(encoding="utf-8")).get("out_dir") or ""
+        except Exception:  # noqa: BLE001
+            _outd = ""
+    for _g in entries:
+        _cmd = _g.get("cmd")
+        if isinstance(_cmd, str) and ("{run_dir}" in _cmd or "{out_dir}" in _cmd):
+            _g["cmd"] = (_cmd.replace("{run_dir}", str(rd).replace("\\", "/"))
+                             .replace("{out_dir}", str(_outd).replace("\\", "/")))
     results = []
     for g in entries:
         gid, title = g.get("id", "gate"), g.get("title", g.get("id", "gate"))

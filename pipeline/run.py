@@ -31,7 +31,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 SDK_ROOT = Path(__file__).resolve().parent.parent
-VERSION = "0.3.0-dev"
+VERSION = "0.3.1"
 
 EXIT_OK, EXIT_ERR, EXIT_GATE, EXIT_AWAIT = 0, 1, 2, 3
 
@@ -453,6 +453,21 @@ def st_deliver(ctx: dict) -> tuple[str, str]:
     want(art / "sources.json", "sources.json")
     if "final.mp4" in missing:
         return "gatefail", f"缺 final.mp4（{final}）；其余在档：{copied}"
+    # 人审包：每场定格帧 + 核对表（无视觉执行者的人眼兜底）
+    try:
+        rp_tool = SDK_ROOT / "tools" / "make_review_pack.py"
+        if rp_tool.is_file():
+            run_cmd([sys.executable, str(rp_tool), "--run-dir", str(rd)], log_path=rd / "logs" / "review-pack.log")
+            rp_md = rd / "review" / "review-pack.md"
+            if rp_md.is_file():
+                dst_dir = out / "review-pack"
+                dst_dir.mkdir(exist_ok=True)
+                shutil.copy(rp_md, dst_dir / "review-pack.md")
+                for png in sorted((rd / "review").glob("*.png")):
+                    shutil.copy(png, dst_dir / png.name)
+                copied.append("review-pack/")
+    except Exception as e:  # noqa: BLE001
+        print(f"（提示）人审包跳过：{e}")
     files = []
     for f in sorted(out.glob("*")):
         if f.is_file():

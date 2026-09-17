@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.3.1 — 2026-09-17
+
+**来源：真机全自主跑通实录（执行者从零做出一支 34s 成片）暴露的三处空洞，全部补齐：**
+
+- 新 `gates/check_timeline.py`（门⑧ 分场时间轴）：重叠 / 长间隙 / 过短场——实录中 scenes 时间轴重叠 2s+ 造成 A/B 舞台打架闪切、其余门全过也抓不住；本门实测抓出该片 4 处问题
+- 新 `tools/make_review_pack.py` + deliver 阶段自动生成：每场定格帧 + 核对表（人审包）——执行者无视觉时的人眼兜底，残影/闪切/穿帮逐场晒出
+- 新 `references/fx-usage.md`：FX-15/FX-16 照抄级用法 + **语义强制规则**（立体/穿越语义禁用平面降级）——实录中执行者把 FX 件复制进工程又当"未使用"删掉
+- PITFALLS 增补：「执行者行为坑」一批（输出截断中断任务 → 大文件分块写；弹药件导入未用 = 降级信号）
+- README / quality-mechanisms / RUNBOOK / INTERFACE / selftest 同步（七件门 → 八件门）
+
 ## v0.3.0（开发中）· 独立接口本体 P2
 
 - 新 `pipeline/run.py`：单入口 stage 机（十段：ingest→transcribe→scenes→design-table→scaffold→build→verify→preview→render→deliver）＋两道确认门（checkpoint-1 设计表 / checkpoint-2 预览）＋退出码（0 完成 / 2 门失败 / 3 待作答 / 1 异常）＋断点续跑（run-state.json）

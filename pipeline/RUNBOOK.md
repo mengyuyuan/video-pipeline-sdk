@@ -21,6 +21,7 @@
 ### Step 4 SCENES + 风格基调
 - 做：逐句分场；状态分配；定本片风格基调（由内容推理由）；给每卡位分配唯一 形式×变体
 - 门：`python ../gates/check_dup.py --scenes scenes.json`
+- 门：`python ../gates/check_timeline.py --scenes scenes.json`（重叠/长间隙/过短场——防 A/B 闪切）
 
 ### Step 5 设计表 → 用户确认（铁律门）
 - 做：出设计表（含「每场概念演出清单」）；附「本片 × 参照物」对照表
@@ -43,5 +44,5 @@
 ### Step 9 全片渲染 + 交付
 - 渲染基建：`npx remotion bundle`（一次，产物在本地 `build/`）→ 之后 `npx remotion render build <Comp> out/final.mp4` 复用（禁每次现拷 public，防 Temp 灌爆，见 PITFALLS §2）；`TEMP/TMP` 指向大盘
 - 音频后处理：`afftdn` → `loudnorm=I=-16:TP=-1.5:LRA=11`；处理链引入的约 30ms 后移用 `atrim=start_sample=N` 裁齐
-- 门：`python ../gates/check_meta.py`（五件套）+ `python ../gates/check_match.py`（对位表）+ **`python ../gates/check_audio.py`**（响度：max≥-3 且 mean≥-20）＋ **`python ../tools/check_sync.py --ref ref.wav --test out/final.mp4`**（|偏移|≤15ms；AAC 固有 ~42.6ms → 裁齐重封复核到 0ms 级）
+- 门：`python ../gates/check_meta.py`（五件套）+ `python ../gates/check_match.py`（对位表）+ **`python ../gates/check_audio.py`**（响度：max≥-3 且 mean≥-20）＋ **`python ../tools/check_sync.py --ref ref.wav --test out/final.mp4`**（|偏移|≤15ms；AAC 固有 ~42.6ms → 裁齐重封复核到 0ms 级）＋ 人审包：`python ../tools/make_review_pack.py --run-dir <run>`（每场定格帧 + 核对表，随交付附上）
 - 交付：final.mp4 + design-table.md + asset-match.md + gate-report.md + sources.json（见 INTERFACE.md）

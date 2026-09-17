@@ -54,3 +54,12 @@ python tools/check_sync.py --ref ref.wav --test out.mp4 --windows 8-14,30-36,60-
 - **多视频层必须显式定位**：第二个 `OffthreadVideo` 走文档流会排到画面外、看起来像"没生效"；所有视频层显式 `position:'absolute', inset:0, width/height:'100%'`。
 - **同文件重复导出同名符号 = 整页白屏**：`import { X }` 挪了位置但旧 `export { X }` 没删 → esbuild `Multiple exports with the same name` → **整个 Studio 页面白屏**（不是单 comp 坏；页面无元素级报错，容易误判成"渲染挂了"）。定位：看 studio 日志的 `ERROR in ./src/...` 行；同名导出只留一处。
 - **无头截屏做元素核验会"假缺失"**：playwright 播放到点截屏的帧位会漂移（等待越久漂移越大，20-30s 处实测可达 ±20 帧），曾两轮把"已经在画面上的元素"报成缺失。元素级 QA 一律用 `npx remotion still build <Comp> --frame=N` 精确单帧；截屏只作粗看。
+
+
+## 6. 执行者行为坑（真机实录 2026-09-17）
+
+| 现象 | 根因 | 修法 |
+|------|------|------|
+| 大任务干到一半静默停住，心跳只回 NO_REPLY | 执行者单次写超大文件被**模型输出上限截断**；回合结束在半途，不自动续写 | ① 开工叮嘱"大文件分块写（2-4 段）"；② 卡住时发一句"继续"即原样接上 |
+| 分场时间轴重叠 2s+，画面 A/B 状态打架闪切 | scenes.json 转写时边界敲错；旧门不查时间轴 | 门⑧ `check_timeline.py` 进 verify（实测抓出该片 4 处问题） |
+| 弹药件（如 FX-15）复制进工程、import 后当"未使用"删除，交付成平面降级 | 执行者拿不准用法 + 看不见效果，删掉保编译 | `references/fx-usage.md` 照抄级用法 + 语义强制规则；人审包抽帧核验 |

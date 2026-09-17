@@ -1,4 +1,4 @@
-﻿# 视频产线 SDK · 自检（非渲染级七件门全数演练：正例过、反例被逮）
+﻿# 视频产线 SDK · 自检（非渲染级八件门全数演练：正例过、反例被逮）
 # 用法: powershell -ExecutionPolicy Bypass -File gates/selftest.ps1
 $ErrorActionPreference = "Continue"
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
@@ -23,6 +23,14 @@ Write-Output "  exit=$LASTEXITCODE"
 
 Write-Output "`n== 门③ 查重（反例 → 期望 1）=="
 python gates/check_dup.py --scenes "$f/scenes_bad.json"
+Write-Output "  exit=$LASTEXITCODE"
+
+Write-Output "`n== 门⑧ 时间轴（正例 → 期望 0）=="
+python gates/check_timeline.py --scenes "$f/timeline_ok.json"
+Write-Output "  exit=$LASTEXITCODE"
+
+Write-Output "`n== 门⑧ 时间轴（反例 → 期望 1）=="
+python gates/check_timeline.py --scenes "$f/timeline_bad.json"
 Write-Output "  exit=$LASTEXITCODE"
 
 Write-Output "`n== 门⑤ 五件套（自包含夹具 → 期望 0）=="

@@ -31,15 +31,16 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 SDK_ROOT = Path(__file__).resolve().parent.parent
-VERSION = "0.3.3"
+VERSION = "0.3.6"
 
 EXIT_OK, EXIT_ERR, EXIT_GATE, EXIT_AWAIT = 0, 1, 2, 3
 
-STAGES = ["ingest", "transcribe", "scenes", "design-table", "scaffold",
+STAGES = ["ingest", "transcribe", "prep", "scenes", "design-table", "scaffold",
           "build", "verify", "preview", "render", "deliver"]
 CHECKPOINTS = {"design-table": "checkpoint-1", "preview": "checkpoint-2"}
 # 需要执行者产出、机器只校验在档的步骤
 EXECUTOR_ARTIFACTS = {
+    "prep": ("prep/cut-plan.json", "粗剪方案（Step 0.5）：钩子句（整句移到开头）+ 口误/重复删段；无裁切需求时写 {\"skip\": true, \"reason\": \"...\"}。"),
     "scenes": ("artifacts/scenes.json", "分场结构 JSON（scenes）。可先在 RUNBOOK Step 4 起草后拷入。"),
     "design-table": ("artifacts/design-table.md", "设计表（design-table.md）。模板见 pipeline/RUNBOOK.md Step 5。"),
     "build": (None, "写码产物。执行者完成后 `touch workdir/.build-ok` 标记（或配置 stages.build.cmd）。"),
@@ -229,6 +230,45 @@ def st_transcribe(ctx: dict) -> tuple[str, str]:
     if code != 0:
         return "error", f"转录失败（需 faster-whisper + 模型；或 init 时给 --transcript）：{out[-300:]}"
     return "done", "转录完成"
+
+
+def st_prep(ctx: dict) -> tuple[str, str]:
+    """Step 0.5 智能粗剪：剪气口 + 剪口误/重复 + 钩子前置（用户 2026.9.8 立：粗剪先行再包装）。
+    机器按 prep/cut-plan.json 执行；下游一切以 prep/ 新轴为准。"""
+    rd, st = ctx["rd"], ctx["state"]
+    prep = rd / "prep"
+    prep.mkdir(parents=True, exist_ok=True)
+    if (prep / "cut.mp4").exists():
+        (rd / "questions" / "need-prep.json").unlink(missing_ok=True)
+        return "done", "粗剪在档（钩子/气口已处理）"
+    plan = prep / "cut-plan.json"
+    if not plan.exists():
+        emit_question(rd, {
+            "id": "need-prep", "type": "free-text", "gate": None,
+            "title": "需要粗剪方案（Step 0.5：剪气口 + 钩子前置）",
+            "description": (EXECUTOR_ARTIFACTS["prep"][1]
+                            + "\n・钩子句 = 全片最炸的一句；start/end 取转录句子边界（词级时间戳可微调）。"
+                            + "\n・气口默认参数：silencedetect -32dB / d=0.7s → 剪到留 0.22s 呼吸（段内全处理）。"
+                            + "\n・读 artifacts/transcript.json 起草；"
+                            + f"\n产出后放入：{plan}"),
+        })
+        return "await", "待执行者提供粗剪方案（prep/cut-plan.json）"
+    proxy_p = rd / "artifacts" / "proxy.mp4"
+    src = str(proxy_p) if proxy_p.exists() else st["source"]
+    code, out = run_cmd([sys.executable, str(SDK_ROOT / "tools" / "prep_cut.py"),
+                         "--proxy", src, "--transcript", str(rd / "artifacts" / "transcript.json"),
+                         "--plan", str(plan), "--out-dir", str(prep)],
+                        log_path=rd / "logs" / "prep.log")
+    if code != 0:
+        return "error", f"粗剪失败：{out[-400:]}"
+    rep = load_json_quiet(prep / "cut-report.json") or {}
+    note = ("跳过粗剪（原片照用）" if rep.get("skipped") else
+            f"粗剪完成 {rep.get('orig_duration')}s → {rep.get('new_duration')}s"
+            f"（钩子{'已前置' if rep.get('hook') else '未前置'}）")
+    (rd / "artifacts" / "prep.json").write_text(json.dumps(
+        {"at": now_iso(), "cut": "prep/cut.mp4", "transcript": "prep/transcript.json",
+         "report": "prep/cut-report.json", "note": note}, ensure_ascii=False, indent=2), encoding="utf-8")
+    return "done", note
 
 
 def st_scenes(ctx: dict) -> tuple[str, str]:
@@ -484,7 +524,7 @@ def st_deliver(ctx: dict) -> tuple[str, str]:
 
 
 HANDLERS = {
-    "ingest": st_ingest, "transcribe": st_transcribe, "scenes": st_scenes,
+    "ingest": st_ingest, "transcribe": st_transcribe, "prep": st_prep, "scenes": st_scenes,
     "design-table": st_design_table, "scaffold": st_scaffold, "build": st_build,
     "verify": st_verify, "preview": st_preview, "render": st_render, "deliver": st_deliver,
 }

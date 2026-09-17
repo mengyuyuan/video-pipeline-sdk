@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.3.6 — 2026-09-17（粗剪先行 · Step 0.5 焊进工序）
+
+- **新增 `prep` 工序（Step 0.5 智能粗剪）**（用户 2026.9.8 立，9-17 夜焊进必经路径）：转录后、分场前强制过一遍——剪气口（`silencedetect -32dB / d=0.7s` → 剪到留 0.22s 呼吸，段内全处理）+ 口误/重复删段（`plan.extra_cuts`）+ **钩子前置**（词级时间戳定位最炸句、整段搬到开头、原位置剔除，禁重复画面）；机器执行 `tools/prep_cut.py` → `prep/cut.mp4` + `prep/transcript.json`（词级重映射新轴；被切开的长句按词边界拆条、同句碎片自动合并）+ `prep/cut-list.md`；**下游一切以 prep/ 新轴为准**（分场/设计表/字幕/工程源片/对位表）；设计表必含《粗剪清单》节；无裁切需求写 `{"skip": true}`。实测样片：34.02s → 29.77s（收掉 4.29s），对账 ±0。
+- **修 FX-16 蒙版接线事故**（s2 人物被扣黑 + 重影 + 黑板背景）：三条铁律（底层必须在场 / mask 尺寸+平铺四件套 / 蒙版在 alpha 通道）+ 两条验收断言；PITFALLS §7 收录。
+- `run.py`：STAGES 插入 `prep`；`VERSION` 字段对齐版本（修历史 0.3.3 漏更问题）。
+
 ## v0.3.5 — 2026-09-17（抠像链 Unicode 修复）
 
 - **修 `tools/rvm_matte.py` 写帧静默失败**：`cv2.imwrite` 在 Windows 遇非 ASCII 路径（如中文 run 目录）不报错、返回 False、零产出——改用 `cv2.imencode().tofile()`（失败即抛）。实录：模型输出「DONE 2043 frames」但目录为空即此坑

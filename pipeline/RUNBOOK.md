@@ -13,6 +13,13 @@
 - 得到：transcript.json（词级时间戳）
 - 门：段数>0；抽 3 段对照（可疑处记「错字待拍板」；子词修正法见 PITFALLS §4）
 
+### Step 2.5 智能粗剪（Step 0.5：粗剪先行再包装 · 用户 2026.9.8 立）
+- 做：读 transcript.json → 写 `prep/cut-plan.json`（钩子句 = 全片最炸一句，start/end 取句子边界；口误/重复段进 extra_cuts；无裁切需求写 `{"skip": true, "reason": "..."}`）
+- 机器：prep 阶段自动执行 `tools/prep_cut.py`（气口：-32dB/0.7s → 剪到留 0.22s 呼吸，段内全处理；钩子整段搬开头、原位置剔除）→ `prep/cut.mp4` + `prep/transcript.json`（词级重映射新轴）+ `prep/cut-list.md`
+- **此后一切以 prep/ 新轴为准**：分场 / 设计表 / 字幕 / 对位表基于 `prep/transcript.json`；写码时工程源片用 `prep/cut.mp4`（禁再用裸 proxy）
+- 设计表必含**《粗剪清单》节**（照抄/引用 `prep/cut-list.md`），随表上 checkpoint-1
+- 门：机器对账（Σ保留 ≈ 新时长）；钩子接缝语序人工过目（设计表环节顺带）
+
 ### Step 3 素材收集
 - 做：Mixkit 抓取（`tools/fetch_mixkit*.py` → `tools/parse_mixkit.py` → 按 id 下载）→ `tools/transcode_stock.py` 统一 1080p30 → **逐支抽帧核验**（`tools/fx5_frames.py` 模式）
 - 得到：素材 + `assets/stock-ledger.json` 登记（来源/许可/时长）
@@ -30,7 +37,7 @@
 - 门：**用户点头才写码**；查重自查过
 
 ### Step 6 写码
-- 做：Remotion 工程（复用 deps/remotion 蓝图）；字体本地化；SFX 从 `assets/sfx/` 与现成库找（禁生成）
+- 做：Remotion 工程（复用 deps/remotion 蓝图）；**源片 = `prep/cut.mp4`（拷贝进工程 assets；禁再用裸 proxy）**；字体本地化；SFX 从 `assets/sfx/` 与现成库找（禁生成）
 - 空间融合：按设计表裁决节把 `../assets/fx` 的件拷进工程；FX-16 先跑抠像链（`tools/rvm_matte.py` → `tools/make_masks.py`；GPU 千帧约 4-5 分钟；前置见 fx-usage §二）
 - 字体：用 `@font-face` CSS 注入（`<FontStyle/>` + `font-display:block`）；**禁** `FontFace.load()`+`delayRender`（打包/多 tab 渲染会超时，见 PITFALLS §2）
 - 调色（如需）：`tools/grade_demo.py` 模式（降噪 → LUT blend 控强度）

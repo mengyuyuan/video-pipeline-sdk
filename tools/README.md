@@ -14,6 +14,7 @@
 | 脚本 | 用途 | 速记 |
 |------|------|------|
 | `transcribe.py` | faster-whisper 词级转录 → JSON | `python transcribe.py --src proxy.mp4 --out transcript.json` |
+| `prep_cut.py` | 智能粗剪（气口/删段/钩子前置 + 时间轴重映射；见 RUNBOOK Step 2.5） | `python prep_cut.py --proxy P --transcript T --plan plan.json --out-dir prep/` |
 | `build_scenes_data.py` | scenes 规划 JSON → scenesData.ts | `python build_scenes_data.py --scenes scenes_v2.json --out src/damo/scenesData.ts` |
 | `fetch_whisper_model.py` | large-v3 模型下载（hf-mirror） | `python fetch_whisper_model.py` |
 

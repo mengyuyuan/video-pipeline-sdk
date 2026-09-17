@@ -68,3 +68,15 @@ python tools/check_sync.py --ref ref.wav --test out.mp4 --windows 8-14,30-36,60-
 - **卡无人应答 ≠ 通过**：确认门过期后执行者以「no_answer → best judgment」越过人工门直接开渲——门没答=停下报告，「用户想要整片」不构成越权理由。
 - **贴图用宿主不认的语法 = 用户眼前空白**：记录中出现 `MEDIA:D:\...` 直贴（外来工作流写法），宿主聊天不渲染。贴图/贴片只认宿主媒体语法（Easel：`/api/media/`）。
 - **cv2.imwrite/imread 遇非 ASCII 路径在 Windows 静默失败**：不抛错、只返回 False——run 目录含中文（如「视频产线」）会踩中（实录：打印 DONE 2043 frames 但零文件）。写图用 `cv2.imencode('.png', img)[1].tofile(path)`；读图用 `cv2.imdecode(np.fromfile(path, np.uint8), cv2.IMREAD_UNCHANGED)`。
+
+## 7. FX-16 蒙版接线事故（人物被扣黑 + 重影 · 真机实录 2026-09-17 夜）
+
+| 症状 | 根因 | 修法 |
+|------|------|------|
+| FX 场次里人物脸部/头部被大块黑色盖住、背景变黑板色、人身旁多出一个错乱的头部轮廓/重影 | ① 宿主把「原片层」在该场隐藏（`{isFx ? null : <PersonLayer/>}`），而改写后的 FX 组件内部只有「元素 + 蒙版人像」两层、**不带原片底层** → 蒙版没盖到的地方直接漏出黑板底；② 蒙版没写缩放/平铺控制：1280×720 蒙版贴 1920×1080 画布，CSS 默认 `mask-size:auto`（原始尺寸、左上角对齐）+ `mask-repeat: repeat`（平铺）→ 开窗错位约 1.5 倍：脸落进蒙版「背景区」被扣掉，真正的开窗落在旁边 | 见下三条铁律 |
+
+**FX-16 三条铁律（照 `assets/fx/FxBehindMask.tsx` 参考件，改写时禁丢行）：**
+1. **三层结构必须齐**：原片底层（z10）→ 背后元素（z15）→ 同源片 + 逐帧蒙版（z16）；宿主若隐藏原片层，FX 组件必须自带底层——**底部原片缺席 = 全场黑板底**。
+2. **蒙版四件套一个都不能少**：`WebkitMaskSize / maskSize: '100% 100%'` + `WebkitMaskRepeat / maskRepeat: 'no-repeat'`（画布≠蒙版原始尺寸时缺一即错位/平铺）。
+3. **蒙版数据在 RGBA 的 alpha 通道**（RGB 全 0 属正常，别当坏文件重造）；脸区 alpha 应为 255。
+4. 验收断言进 `checks.json`：① 人像区亮度/色差（防底层缺失）② 背景区不得为纯黑（对原始帧抽样比色）——本案两处断言均如实抓出过故障。

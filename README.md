@@ -14,7 +14,8 @@
 
 - **两道确认门**：设计表确认 → 才写码；Studio 预览确认 → 才渲全片
 - **八件核验门（全可跑）**：帧检 / 转场可感知 / 查重 / 素材↔台词对位 / 五件套自检 / 排版网格 / **分场时间轴** / 音频响度 —— `gates/selftest.ps1` 一键自检
-- **人审包（review-pack）**：交付自动生成每场定格帧 + 核对表（`tools/make_review_pack.py`）——无视觉的执行者靠人眼兜底
+- **人审包（review-pack）**：交付自动生成每场定格帧 + 核对表（`tools/make_review_pack.py`）——**有视觉工具的执行者先自检，人眼终审兜底**
+- **看图自检（see.py）**：`tools/see.py` 把关键帧/素材交给多模态端点核查（密度/字幕/素场）——把"无视觉执行者"升级为"能自检的执行者"（工序见 RUNBOOK Step 7）
 - **音画同步核验**：互相关实测到 ms 级（`tools/check_sync.py`），交付前 |偏移| ≤ 15ms（实测可达 0.0ms）
 - **弹药仓**：19 件效果件（含卡片系统 + 空间融合件）、字体、胶片 LUT、现成音效库、素材台账；**FX-15/16 用法与硬规则见 `references/fx-usage.md`**
 - **坑位总表**：`PITFALLS.md` —— Windows / Remotion / ffmpeg / whisper 实战血账

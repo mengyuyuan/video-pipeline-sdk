@@ -1,6 +1,6 @@
 import subprocess, os
 
-d = "E:/remotion-test/public/stock/"
+d = os.environ.get("REMOTION_PROJECT", ".") + "/public/stock/"
 names = ["stock_milkyway", "stock_snowforest", "stock_sunset", "stock_editor", "stock_tunnel"]
 
 for n in names:
@@ -28,7 +28,7 @@ for f in os.listdir(d):
 print(f"stock dir total: {total // 1024 // 1024}MB")
 
 total_pub = 0
-for root, dirs, files in os.walk("E:/remotion-test/public"):
+for root, dirs, files in os.walk(os.environ.get("REMOTION_PROJECT", ".") + "/public"):
     for f in files:
         try:
             total_pub += os.path.getsize(os.path.join(root, f))

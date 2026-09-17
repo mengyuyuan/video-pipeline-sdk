@@ -1,8 +1,9 @@
 import re
+import os
 
 cats = ["night-sky", "forest", "technology", "city", "ocean", "aurora"]
 for c in cats:
-    html = open(f"C:/temp/mixkit/{c}.html", encoding="utf-8").read()
+    html = open((os.environ.get("TEMP") or "/tmp") + f"/mixkit/{c}.html", encoding="utf-8").read()
     pairs = {}
     for m in re.finditer(r'/free-stock-video/([a-z0-9][a-z0-9-]*?)-(\d+)/', html):
         slug, pid = m.group(1), m.group(2)

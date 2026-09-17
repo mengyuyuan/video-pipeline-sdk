@@ -1,7 +1,8 @@
 import subprocess, re, os
 
 UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
-os.makedirs("C:/temp/mixkit2", exist_ok=True)
+TMP = os.environ.get("TEMP") or "/tmp"
+os.makedirs(TMP + "/mixkit2", exist_ok=True)
 slugs = ["money", "business", "abstract", "office"]
 
 for slug in slugs:

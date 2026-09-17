@@ -1,7 +1,7 @@
 import subprocess, os, json
 
 UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
-d = "E:/remotion-test/public/sfx/"
+d = os.environ.get("REMOTION_PROJECT", ".") + "/public/sfx/"
 os.makedirs(d, exist_ok=True)
 
 picks = [

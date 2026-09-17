@@ -1,7 +1,8 @@
 import subprocess, re, os
 
 UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
-os.makedirs("C:/temp/mixkit", exist_ok=True)
+TMP = os.environ.get("TEMP") or "/tmp"
+os.makedirs(TMP + "/mixkit", exist_ok=True)
 slugs = ["night-sky", "forest", "technology", "city", "ocean", "aurora"]
 
 for slug in slugs:
@@ -16,6 +17,6 @@ for slug in slugs:
     print(f"== {slug}: {len(html)} bytes, {len(urls)} mp4 urls")
     for u in urls[:14]:
         print("   ", u)
-    with open(f"C:/temp/mixkit/{slug}.html", "w", encoding="utf-8") as f:
+    with open(f"{TMP}/mixkit/{slug}.html", "w", encoding="utf-8") as f:
         f.write(html)
 print("DONE")

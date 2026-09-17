@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.3.3 — 2026-09-17（可移植性）
+
+- 去本机化：`gates/` `tools/` 的默认路径不再指向作者机器——`--project` / `--root` / `--clipsdir` 默认读 `REMOTION_PROJECT` 环境变量（未设=当前目录）；抽帧字体回退 `C:/Windows/Fonts/simhei.ttf`（可用 `CJK_FONT` 覆盖）；模型目录默认 `~/models/...`；临时产物走系统临时目录
+- 文档同步（RUNBOOK / DEPS / references）
+- `VERSION` 字段修正（0.3.2 文档版未同步该字段，本版起 = 0.3.3）
+- 本版起作为内置快照随 Easel `video-production` 技能分发；来源仓：mengyuyuan/video-pipeline-sdk
+
 ## v0.3.2 — 2026-09-17（文档 · 工序）
 
 - RUNBOOK Step 7 新增「视觉自检」工序：执行者具备看图工具时，渲关键帧先自检（密度 / 字幕 / 素场）再往下；无工具维持人审包兜底

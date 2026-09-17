@@ -12,7 +12,7 @@
 | ffmpeg | 8.1 full build | 必须含滤镜：`lut3d / curves / eq / colorbalance / hqdn3d / nlmeans / unsharp / volumedetect / loudnorm` |
 | Python | 3.11 | 工具与门脚本 |
 | faster-whisper + ctranslate2 | 已装 | GPU 转录（CUDA） |
-| Whisper large-v3 模型 | 3.09GB | 本地目录 `E:/models/faster-whisper-large-v3`（**不入包**；附下载脚本，hf-mirror 直拉） |
+| Whisper large-v3 模型 | 3.09GB | 模型目录自备（**不入包**；下载脚本 `tools/fetch_whisper_model.py`，hf-mirror 直拉） |
 | CUDA GPU | RTX 3060（本机） | 转录/渲染加速；无 GPU 时转录退 CPU（慢） |
 
 ## 包内自带

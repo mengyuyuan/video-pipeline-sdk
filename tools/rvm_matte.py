@@ -1,7 +1,7 @@
 # RVM 抠像：任意口播视频 → RGBA PNG 序列（人像 + alpha）
 # 前置：pip install torch torchvision numpy opencv-python
 #       模型目录含 model/（RVM 仓库包）与 rvm_mobilenetv3.pth（15MB 权重）
-# 用法：python rvm_matte.py --src in.mp4 --out rgba_dir [--rvm E:/models/rvm] [--dsr 0.375]
+# 用法：python rvm_matte.py --src in.mp4 --out rgba_dir [--rvm <RVM 目录>] [--dsr 0.375]
 # 下一步：make_masks.py 把 RGBA 序列转成交付蒙版集（pa_0000.png…）
 import argparse
 import os
@@ -15,7 +15,7 @@ import torch
 ap = argparse.ArgumentParser()
 ap.add_argument('--src', required=True, help='输入视频（建议 1080p 代理）')
 ap.add_argument('--out', required=True, help='输出目录（rgba_%04d.png）')
-ap.add_argument('--rvm', default='E:/models/rvm', help='RVM 目录（含 model/ 与权重）')
+ap.add_argument('--rvm', default=os.path.expanduser('~/models/rvm'), help='RVM 目录（含 model/ 与权重）')
 ap.add_argument('--weights', default='rvm_mobilenetv3.pth')
 ap.add_argument('--dsr', type=float, default=0.375, help='downsample ratio')
 a = ap.parse_args()

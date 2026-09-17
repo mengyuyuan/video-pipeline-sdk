@@ -1,7 +1,8 @@
 import subprocess, os, json
 
 UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
-os.makedirs("E:/remotion-test/public/stock", exist_ok=True)
+D = os.environ.get("REMOTION_PROJECT", ".") + "/public/stock"
+os.makedirs(D, exist_ok=True)
 
 items = [
     ("stock_milkyway", 4148, "milky-way-seen-at-night", "night-sky"),
@@ -16,7 +17,7 @@ for name, vid, slug, cat in items:
     done = False
     for res in ["1080", "720", "360"]:
         url = f"https://assets.mixkit.co/videos/{vid}/{vid}-{res}.mp4"
-        out = f"E:/remotion-test/public/stock/{name}.mp4"
+        out = f"{D}/{name}.mp4"
         try:
             subprocess.run(["curl", "-sL", "-A", UA, "-o", out, url], capture_output=True, timeout=240)
         except Exception as e:
@@ -40,6 +41,6 @@ for name, vid, slug, cat in items:
     if not done:
         print(name, "FAILED")
 
-with open("E:/remotion-test/public/stock/SOURCES.json", "w", encoding="utf-8") as f:
+with open(D + "/SOURCES.json", "w", encoding="utf-8") as f:
     json.dump(log, f, indent=2, ensure_ascii=False)
 print("DONE", len(log), "ok")

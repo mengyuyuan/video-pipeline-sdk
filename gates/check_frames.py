@@ -47,7 +47,7 @@ def analyze(img_path, checks):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--project", default="E:/remotion-test")
+    ap.add_argument("--project", default=os.environ.get("REMOTION_PROJECT", "."))
     ap.add_argument("--comp", required=True)
     ap.add_argument("--frames", required=True, help="逗号分隔，如 60,120")
     ap.add_argument("--checks", help="checks.json 路径（可选；不给=人眼模式）")

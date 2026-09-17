@@ -1,8 +1,8 @@
 import subprocess, os
 from PIL import Image, ImageDraw, ImageFont
 
-d = "E:/remotion-test/public/stock/"
-out = "C:/temp/fx5_frames/"
+d = os.environ.get("REMOTION_PROJECT", ".") + "/public/stock/"
+out = (os.environ.get("TEMP") or "/tmp") + "/fx5_frames/"
 os.makedirs(out, exist_ok=True)
 
 items = [
@@ -28,7 +28,7 @@ for label, name, times in items:
 cw, ch = 384, 216
 sheet = Image.new("RGB", (cw * 5, 44 + ch * 2), (12, 12, 16))
 draw = ImageDraw.Draw(sheet)
-font = ImageFont.truetype("E:/remotion-test/public/fonts/simhei.ttf", 26)
+font = ImageFont.truetype(os.environ.get("CJK_FONT", "C:/Windows/Fonts/simhei.ttf"), 26)
 for i, (label, fl) in enumerate(frames):
     x = i * cw
     draw.text((x + cw // 2, 22), label, font=font, fill=(240, 240, 240), anchor="mm")
@@ -36,8 +36,8 @@ for i, (label, fl) in enumerate(frames):
         if os.path.exists(p):
             im = Image.open(p).convert("RGB").resize((cw, ch))
             sheet.paste(im, (x, 44 + j * ch))
-sheet.save("C:/temp/fx5_check_sheet.png")
-print("saved C:/temp/fx5_check_sheet.png", sheet.size)
+sheet.save(out + "fx5_check_sheet.png")
+print(f"saved {out}fx5_check_sheet.png", sheet.size)
 
 for label, fl in frames:
     for p in fl:

@@ -1,7 +1,7 @@
 # 管线流程（RUNBOOK · 九步可执行版）
 
 > 每步：**需要 → 做（命令）→ 得到 → 门（不过不往下走）**
-> 工作工程：`E:/remotion-test`（或用 deps/remotion 蓝图新建）；工具在 `../tools/`，门在 `../gates/`。
+> 工作工程目录自定（示例 `E:/remotion-test`；也可用 deps/remotion 蓝图新建）；工具在 `../tools/`，门在 `../gates/`。
 
 ### Step 1 素材摸底
 - 做：ffprobe 摸底 → 抽帧 → 人脸安全区 → 转码 proxy（`-g 30` 关键帧）

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """下载 faster-whisper large-v3 到本地（hf-mirror 直拉，不依赖 huggingface_hub 库）
-用法：python tools/fetch_whisper_model.py [--dest E:/models/faster-whisper-large-v3]
+用法：python tools/fetch_whisper_model.py [--dest <目标目录>]
 说明：hub 库走不通（墙），curl 直拉镜像可行；文件清单里**没有** vocabulary.txt（是 vocabulary.json）。
 完成后：WhisperModel('<dest>', device='cuda', compute_type='float16') 直读。
 """
@@ -14,7 +14,7 @@ FILES = ["config.json", "tokenizer.json", "vocabulary.json", "preprocessor_confi
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--dest", default="E:/models/faster-whisper-large-v3")
+    ap.add_argument("--dest", default=os.path.expanduser("~/models/faster-whisper-large-v3"))
     a = ap.parse_args()
     os.makedirs(a.dest, exist_ok=True)
     for f in FILES:

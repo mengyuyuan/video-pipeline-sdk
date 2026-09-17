@@ -1,11 +1,11 @@
 import subprocess, os
 from PIL import Image, ImageDraw, ImageFont
 
-LUT_DIR = "C:/temp/grade_compare"
-OUT = "C:/temp/grade_demo"
+LUT_DIR = (os.environ.get("TEMP") or "/tmp") + "/grade_compare"
+OUT = (os.environ.get("TEMP") or "/tmp") + "/grade_demo"
 LUTS = OUT + "/luts"
 os.makedirs(LUTS, exist_ok=True)
-base = "E:/remotion-test/public/assets/proxy.mp4"
+base = os.environ.get("REMOTION_PROJECT", ".") + "/public/assets/proxy.mp4"
 
 def clean_lut(name):
     src = os.path.join(LUT_DIR, name)
@@ -54,8 +54,8 @@ CW, CH = 640, 360
 HDR = 58
 canvas = Image.new("RGB", (CW * 3, HDR + 3 * (CH + 26)), (10, 12, 16))
 dr = ImageDraw.Draw(canvas)
-font = ImageFont.truetype("E:/remotion-test/public/fonts/simhei.ttf", 26)
-font_s = ImageFont.truetype("E:/remotion-test/public/fonts/simhei.ttf", 20)
+font = ImageFont.truetype(os.environ.get("CJK_FONT", "C:/Windows/Fonts/simhei.ttf"), 26)
+font_s = ImageFont.truetype(os.environ.get("CJK_FONT", "C:/Windows/Fonts/simhei.ttf"), 20)
 cols = ["原片（无处理）", "方案A · Portra160NC 60% + 降噪", "方案B · Fuji400H 45% + 降噪"]
 for i, c in enumerate(cols):
     dr.text((i * CW + CW // 2, HDR // 2 + 2), c, font=font, fill=(235, 240, 248), anchor="mm")

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """门 ④ 素材↔台词对位：校验每支素材有台词映射、窗口合法；抽帧核验表 + 对位表
 用法：
-  python check_match.py --scenes match.json [--clipsdir E:/remotion-test/public/stock] [--out asset-match.md] [--sheet]
+  python check_match.py --scenes match.json [--clipsdir <REMOTION_PROJECT>/public/stock] [--out asset-match.md] [--sheet]
 match.json（与 FxMatch 的 SCENES 同构）：
   [{"scene":1,"no":"①","sub":"台词","clip":"stock_x.mp4","clip_start":1.0,"dur":4.0,"credit":"..."}, ...]
 判定：clip 文件存在 && clip_start+dur <= 素材时长 && sub 非空；--sheet 时抽帧拼核验表。
@@ -23,10 +23,10 @@ def probe_duration(path):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--scenes", required=True)
-    ap.add_argument("--clipsdir", default="E:/remotion-test/public/stock")
+    ap.add_argument("--clipsdir", default=os.environ.get("REMOTION_PROJECT", ".") + "/public/stock")
     ap.add_argument("--out", help="对位表 md 输出")
     ap.add_argument("--sheet", action="store_true", help="抽帧拼核验表 png")
-    ap.add_argument("--frame-font", default="E:/easel-pipeline-port/video-pipeline-sdk/assets/fonts/simhei.ttf")
+    ap.add_argument("--frame-font", default=os.environ.get("CJK_FONT", "C:/Windows/Fonts/simhei.ttf"))
     args = ap.parse_args()
 
     scenes = json.load(open(args.scenes, encoding="utf-8"))

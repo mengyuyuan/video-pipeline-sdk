@@ -38,11 +38,11 @@ python gates/check_meta.py --project "$f/proj.json" --root $sdk
 Write-Output "  exit=$LASTEXITCODE"
 
 Write-Output "`n== 门④ 对位（需本机示例素材目录；无则跳过）=="
-if (Test-Path "E:\remotion-test\public\stock") {
-  python gates/check_match.py --scenes "$f/match.json" --clipsdir "E:\remotion-test\public\stock" --out "$env:TEMP\sdk_match.md"
+if ($env:REMOTION_PROJECT -and (Test-Path "$env:REMOTION_PROJECT\public\stock")) {
+  python gates/check_match.py --scenes "$f/match.json" --clipsdir "$env:REMOTION_PROJECT\public\stock" --out "$env:TEMP\sdk_match.md"
   Write-Output "  exit=$LASTEXITCODE"
 } else {
-  Write-Output "  skip（未找到 E:/remotion-test/public/stock）"
+  Write-Output "  skip（未设 REMOTION_PROJECT 或无 public/stock）"
 }
 
 Write-Output "`n== 门⑦ 音频响度（合成测试音 → 期望 0）=="

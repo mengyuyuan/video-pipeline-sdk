@@ -28,7 +28,7 @@ def diff_ratio(p1, p2):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--project", default="E:/remotion-test")
+    ap.add_argument("--project", default=os.environ.get("REMOTION_PROJECT", "."))
     ap.add_argument("--comp")
     ap.add_argument("--cuts", help="逗号分隔切点帧号")
     ap.add_argument("--span", type=int, default=4)

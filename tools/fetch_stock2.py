@@ -1,7 +1,7 @@
 import subprocess, os, json
 
 UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
-d = "E:/remotion-test/public/stock/"
+d = os.environ.get("REMOTION_PROJECT", ".") + "/public/stock/"
 
 items = [
     ("stock_scrambled", 31771, "scrambled-dots-and-lines-within-a-sphere-of-dots", "technology"),

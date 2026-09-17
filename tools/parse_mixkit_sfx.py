@@ -1,8 +1,9 @@
 import re
+import os
 
 for slug in ["whoosh", "riser", "impact", "transition"]:
     try:
-        html = open(f"C:/temp/mixkit_sfx/{slug}.html", encoding="utf-8").read()
+        html = open((os.environ.get("TEMP") or "/tmp") + f"/mixkit_sfx/{slug}.html", encoding="utf-8").read()
     except FileNotFoundError:
         print(f"== {slug}: html 未保存，跳过")
         continue

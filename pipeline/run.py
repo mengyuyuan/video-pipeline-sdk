@@ -31,7 +31,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 SDK_ROOT = Path(__file__).resolve().parent.parent
-VERSION = "0.3.1"
+VERSION = "0.3.3"
 
 EXIT_OK, EXIT_ERR, EXIT_GATE, EXIT_AWAIT = 0, 1, 2, 3
 

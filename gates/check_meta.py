@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """门 ⑤ 五件套自检：素材 / 动画 / 转场 / 音效 / 原画面 齐备 + 音效挂载合法
-用法：python check_meta.py --project proj.json [--root E:/remotion-test]
+用法：python check_meta.py --project proj.json [--root <REMOTION_PROJECT>]
 proj.json:
   {"source": "public/assets/proxy.mp4",
    "materials": ["stock/a.mp4"], "animations": ["FxCardB"], "transitions": ["wipe","slide","zoom","fade"],
@@ -14,7 +14,7 @@ import argparse, json, os, sys
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--project", required=True)
-    ap.add_argument("--root", default="E:/remotion-test")
+    ap.add_argument("--root", default=os.environ.get("REMOTION_PROJECT", "."))
     args = ap.parse_args()
     d = json.load(open(args.project, encoding="utf-8"))
 

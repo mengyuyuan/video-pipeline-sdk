@@ -2,8 +2,9 @@ import subprocess, os, json
 from PIL import Image, ImageDraw, ImageFont
 
 UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
-d = "E:/remotion-test/public/stock/"
-os.makedirs("C:/temp/fx5b", exist_ok=True)
+d = os.environ.get("REMOTION_PROJECT", ".") + "/public/stock/"
+TMP = os.environ.get("TEMP") or "/tmp"
+os.makedirs(TMP + "/fx5b", exist_ok=True)
 
 items = [
     ("stock_bubbles", 51869, "blurry-sky-background-with-bubbles-floating-in-front", "bubbles"),
@@ -45,7 +46,7 @@ frames = []
 for name, label in [("stock_bubbles", "A 泡泡·天空（泡影）"), ("stock_dunes", "B 撒哈拉沙丘（空）")]:
     fl = []
     for t in [1.0, 3.5]:
-        p = f"C:/temp/fx5b/{name}_{t}.png"
+        p = f"{TMP}/fx5b/{name}_{t}.png"
         subprocess.run(["ffmpeg", "-v", "error", "-ss", str(t), "-i", d + name + ".mp4", "-frames:v", "1", p, "-y"], timeout=60)
         fl.append(p)
     frames.append((label, fl))
@@ -53,7 +54,7 @@ for name, label in [("stock_bubbles", "A 泡泡·天空（泡影）"), ("stock_d
 cw, ch = 640, 360
 sheet = Image.new("RGB", (cw * 2, 46 + ch * 2), (12, 12, 16))
 draw = ImageDraw.Draw(sheet)
-font = ImageFont.truetype("E:/remotion-test/public/fonts/simhei.ttf", 28)
+font = ImageFont.truetype(os.environ.get("CJK_FONT", "C:/Windows/Fonts/simhei.ttf"), 28)
 for i, (label, fl) in enumerate(frames):
     x = i * cw
     draw.text((x + cw // 2, 23), label, font=font, fill=(240, 240, 240), anchor="mm")
@@ -61,8 +62,8 @@ for i, (label, fl) in enumerate(frames):
         if os.path.exists(p):
             im = Image.open(p).convert("RGB").resize((cw, ch))
             sheet.paste(im, (x, 46 + j * ch))
-sheet.save("C:/temp/fx5b_sheet.png")
-print("saved C:/temp/fx5b_sheet.png", sheet.size)
+sheet.save(TMP + "/fx5b_sheet.png")
+print(f"saved {TMP}/fx5b_sheet.png", sheet.size)
 
 sp = d + "SOURCES.json"
 old = json.load(open(sp, encoding="utf-8")) if os.path.exists(sp) else []

@@ -3,7 +3,7 @@
 
 用法:
   python transcribe.py --src video.mp4 --out transcript.json
-  python transcribe.py --src video.mp4 --out t.json --model E:/models/faster-whisper-large-v3 --device cuda
+  python transcribe.py --src video.mp4 --out t.json --model <模型目录> --device cuda
 
 说明:
   - 口播建议 vad_filter=False：软语音被当静音切掉是常见事故源。
